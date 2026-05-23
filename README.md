@@ -73,4 +73,4 @@ Id 9        (Spa:Enum:VideoFormat:xRGB)
 
 ## 致谢
 
-本项工作感谢生成式人工智能 [Claude](https://claude.ai) 与 [Deepseek](https://chat.deepseek.com) 的协作。
+本项工作感谢生成式人工智能 [Claude](https://claude.ai) 与 [Deepseek](https://chat.deepseek.com) 的协助。
