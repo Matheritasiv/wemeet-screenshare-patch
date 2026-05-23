@@ -66,7 +66,7 @@ Id 9        (Spa:Enum:VideoFormat:xRGB)
 
 `libhook.so` 的源码见 `hook/hook.asm`。其通过入参 `rdi` 的格式识别是 hook 调用还是真正的 C 库 `getenv()` 调用，后者直接转发到 C 库，前者则处理以下两种逻辑：
 
-* 该 hook 调用来自 `libscreen_share_module.so`。此时保存源缓冲区指针至线程全局变量以供后续比对。
+* 该 hook 调用来自 `libscreen_share_module.so`。此时保存源缓冲区指针至线程静态变量以供后续比对。
 * 该 hook 调用来自 `libxcast.so`。此时比较源缓冲区指针与已保存的源缓冲区指针，如果不同则表明这是来自其他线程的无关调用，直接返还控制流；如果相同表明正是目标调用，清除该变量，然后执行转码路径。转码使用 AVX2 `shuffle` 指令高效处理，一轮循环可处理 64 个像素点。
 
 
