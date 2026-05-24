@@ -25,6 +25,7 @@ getenv:
     dec     rdi                 ; RTLD_NEXT
     lea     rsi,    [name_call]
     call    [dlsym wrt ..got]
+    mov     [ptr_call], rax
     pop     rdi
 .cached_call:
     jmp     rax                 ; real getenv()
