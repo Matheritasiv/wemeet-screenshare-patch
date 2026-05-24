@@ -120,7 +120,7 @@ getenv:
     shl     edi,    16
     xor     eax,    edi
     mov     dword [rbx+rcx], eax
-    inc     ecx
+    add     ecx,    4
     dec     r14d
     jne     .loop_1px
 .loop_1px_end:
