@@ -22,7 +22,7 @@ export LD_PRELOAD="/path/to/libhook.so"
 
 
 
-**注意事项**：如果当前系统的 portal 后端没有颜色格式的问题（详见**技术细节**部分），用户可在打补丁前自行注释掉 `patch.py` 中的 `Hunk 1a` 和 `Hunk 1b`，此时只需第一步即可，无需 preload hook。
+**注意事项**：如果当前系统的 portal 后端没有颜色格式的问题（详见**技术细节**部分），用户应在打补丁前自行注释掉 `patch.py` 中的 `Hunk 1a` 和 `Hunk 1b`，此时仅需第一步即可，无需 preload hook，否则会出现颜色不正确的问题。
 
 
 
