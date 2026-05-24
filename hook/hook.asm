@@ -17,20 +17,17 @@ getenv:
     cmp     eax,    0
     jg      .hook_call
 .real_call:
-    push    rdi
     mov     rax,    [ptr_call]
     test    rax,    rax
     jne     .cached_call
+    push    rdi
     xor     edi,    edi
     dec     rdi                 ; RTLD_NEXT
     lea     rsi,    [name_call]
     call    [dlsym wrt ..got]
-    mov     rdi,    [rsp]
-.cached_call:
-    call    rax                 ; real getenv()
     pop     rdi
-.return:
-    ret
+.cached_call:
+    jmp     rax                 ; real getenv()
 .hook_call:
     cmp     eax,    2
     jg      .return             ; invalid hook call
@@ -41,6 +38,7 @@ getenv:
     ;                    Save the address of src.
     ;                    KEEP: r11
     mov     FS:[rax], rsi
+.return:
     ret
 .flip:
     ;   case `eax == 2`: A hook call from `libxcast.so`.

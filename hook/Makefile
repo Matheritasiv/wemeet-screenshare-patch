@@ -11,7 +11,7 @@ LDFLAGS  := \
 	-L/usr/lib64 -lc
 STRIP    := strip
 
-all: dyn exe
+all: dyn
 
 dyn: lib$(NAME).so
 dyn: LDFLAGS += -shared -e 0 -T $(NAME).ld
@@ -39,7 +39,10 @@ edit_main:
 edit_ld:
 	vim -c 'set nu et tabstop=4 shiftwidth=4' "$(NAME).ld"
 
+test: dyn exe
+	LD_PRELOAD=$(shell readlink -f ./lib$(NAME).so) ./main
+
 clean:
 	-rm -f "lib$(NAME).so" "$(NAME).o" "main" "main.o"
 
-.PHONY: all dyn exe edit edit_main edit_ld clean
+.PHONY: all dyn exe edit edit_main edit_ld test clean
