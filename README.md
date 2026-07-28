@@ -14,6 +14,13 @@ python3 /path/to/patch.py "$WEMEET_ROOT"
 
 给库文件打补丁。
 
+如需让系统 Portal 选择器同时提供显示器和应用窗口，增加
+`--window-sources`：
+
+```
+python3 /path/to/patch.py "$WEMEET_ROOT" --window-sources
+```
+
 **Step 2.** 在 `$WEMEET_ROOT/wemeetapp.sh` 中加入
 
 ```
@@ -44,6 +51,36 @@ OpenPipeWireRemote
 在当前版本的实现中，`Start` 的调用逻辑直接放在了 `SelectSources` 后面，而没有等待其调用完成；相对应的是 `OpenPipeWireRemote` 的调用正确地放到了回调函数 `onStartResponse` 中。这本质上是一个依赖竞态条件的未定义行为：`xdg-desktop-portal-gnome` 后端选择在 `SelectSources` 中立即设定屏幕捕获参数相关的内部状态，而在 `Start` 调用中弹窗等待用户选择显示器，这种设计掩盖了客户端的逻辑缺陷；但在 `xdg-desktop-portal-wlr` 后端默认配置情况下 `SelectSources` 同步调用外部程序 `slurp` 等待用户选择显示器，这将必然导致 `Start` 失败（除非在微秒级时间内完成选择）。
 
 `patch.py` 中的 `Hunk 0` 通过修改 `libscreen_share_module.so` 中的控制流将 `Start` 调用移至 `onSelectSourcesResponse` 中，修复了异步链式调用逻辑。
+
+
+
+### 应用窗口共享
+
+ScreenCast Portal 的 `types` 参数是位掩码，其中 `MONITOR` 为 `1`，
+`WINDOW` 为 `2`，`VIRTUAL` 为 `4`。腾讯会议默认只请求 `MONITOR`，
+因此 Portal 选择器不会提供单个应用窗口。
+
+使用 `--window-sources` 时，可选补丁将 `libscreen_share_module.so`
+文件偏移 `0x43bbdb` 处的指令由
+
+```
+83 3f 00    cmpl $0,(%rdi)
+```
+
+改为
+
+```
+83 0f 02    orl $2,(%rdi)
+```
+
+即在原有 `types` 上增加 `WINDOW` 位。`orl` 会根据更新后的结果设置条件
+标志，而中间的 `mov` 不改变这些标志，因此紧随其后的条件跳转仍会判断
+更新后的 `types` 是否非零。补丁只允许 Portal 提供窗口选项，不会替用户
+选择共享来源。
+
+`types` 的数值由 XDG Desktop Portal 规范统一定义，但实际支持的来源由
+Portal 后端的 `AvailableSourceTypes` 决定。如果当前后端不支持窗口捕获，
+请勿启用此选项。
 
 
 

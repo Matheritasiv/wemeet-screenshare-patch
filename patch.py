@@ -68,6 +68,16 @@ PATCHES: Dict[str, List[Hunk]] = {
     }],
 }
 
+WINDOW_SOURCE_PATCHES: Dict[str, List[Hunk]] = {
+    "bin/modules/screen_share/libscreen_share_module.so": [
+    { #{{{ Optional Hunk 2: allow MONITOR | WINDOW sources in the XDG portal picker
+        0x43bbdb: (
+            bytes.fromhex("833f00"),
+            bytes.fromhex("830f02")),
+    #}}}
+    }],
+}
+
 # ── Hunk-level operations ─────────────────────────────────────────────────────
 
 def validate_hunk(mm: mmap.mmap, hunk: Hunk, file_size: int, show_ok: bool = True) -> bool:
@@ -153,18 +163,24 @@ def main() -> None:
     parser.add_argument("install_dir", help="Tencent Wemeet installation directory (e.g. /opt/wemeet)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Validate only, do not write anything")
+    parser.add_argument("--window-sources", action="store_true",
+                        help="Allow selecting application windows in the XDG portal picker")
     args = parser.parse_args()
 
     install_dir = args.install_dir.rstrip("/")
     overall_ok = True
 
     for rel_path, hunks in PATCHES.items():
+        selected_hunks = list(hunks)
+        if args.window_sources:
+            selected_hunks.extend(WINDOW_SOURCE_PATCHES.get(rel_path, []))
+
         full_path = f"{install_dir}/{rel_path}"
         print(f"\n{'═' * 64}")
         print(f"  Target : {full_path}")
-        print(f"  Hunks  : {len(hunks)}")
+        print(f"  Hunks  : {len(selected_hunks)}")
 
-        rc = patch_file(full_path, hunks, dry_run=args.dry_run)
+        rc = patch_file(full_path, selected_hunks, dry_run=args.dry_run)
         if rc != 0:
             overall_ok = False
 
