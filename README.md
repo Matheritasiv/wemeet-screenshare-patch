@@ -14,6 +14,12 @@ python3 /path/to/patch.py "$WEMEET_ROOT"
 
 给库文件打补丁。
 
+如需让 Portal 选择器增加应用窗口选项，可按需运行独立脚本：
+
+```
+python3 /path/to/window_sources.py "$WEMEET_ROOT"
+```
+
 **Step 2.** 在 `$WEMEET_ROOT/wemeetapp.sh` 中加入
 
 ```
@@ -47,6 +53,15 @@ OpenPipeWireRemote
 
 
 
+### 应用窗口共享
+
+腾讯会议默认只请求 ScreenCast Portal 的 `MONITOR` 来源。
+`window_sources.py` 在 `types` 中加入 `WINDOW`，使 Portal 选择器增加应用窗口选项。
+
+该脚本仅适用于腾讯会议 v3.26.10.401。如果当前 Portal 后端不支持窗口捕获，请勿运行该脚本。
+
+
+
 ### 缓冲区颜色格式转换
 
 在 pipewire 格式协商阶段，客户端需要与 portal 后端协商包括颜色格式在内的一系列参数。在当前版本的实现中，客户端硬编码了
@@ -73,4 +88,4 @@ Id 9        (Spa:Enum:VideoFormat:xRGB)
 
 ## 致谢
 
-本项工作感谢生成式人工智能 [Claude](https://claude.ai) 与 [Deepseek](https://chat.deepseek.com) 的协助。
+本项工作感谢生成式人工智能 [Claude](https://claude.ai)、[Deepseek](https://chat.deepseek.com) 与 [ChatGPT](https://chatgpt.com/) 的协助。
