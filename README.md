@@ -71,6 +71,20 @@ Id 9        (Spa:Enum:VideoFormat:xRGB)
 
 
 
+## Hyprland / xdg-desktop-portal-hyprland
+
+在 Hyprland（以及使用 `xdg-desktop-portal-hyprland` 的合成器）上，只打 Hunk 0
+仍然共享不了：AUR `wemeet-bin` 的启动脚本会让共享绕开 portal。需要同时
+
+1. 去掉 `bwrap --unshare-pid`；
+2. 去掉 `export WEMEET_XWAYLAND=1`（`libscreen_share_module.so` 里
+   `IsUseXDGDesktopPortal()` 就是 `getenv("WEMEET_XWAYLAND") == "1"`）；
+3. 只打 Hunk 0（Hunk 1a/1b 在 XDPH 下不需要）。
+
+详见 [docs/hyprland-xdph.md](docs/hyprland-xdph.md)，配套启动器见
+[tools/wemeet-wayland-launcher.sh](tools/wemeet-wayland-launcher.sh)
+（不改动 `/opt/wemeet` 下的系统文件）。
+
 ## 致谢
 
 本项工作感谢生成式人工智能 [Claude](https://claude.ai) 与 [Deepseek](https://chat.deepseek.com) 的协助。
